@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Predict Flight</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+    <link rel="stylesheet" type="text/css"
+          href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
+</head>
+<body>
+<script type="text/javascript"
+        src="/webjars/jquery/2.0.3/jquery.min.js"></script>
+<div class="container">
+    <div class="jumbotron">
+        <h1>Choose your flight ✈️</h1>
+        <p>
+
+        </p>
+        <form action="javascript:predictFlight();" id="predictForm">
+            <!--<label for="year">Year</label>-->
+            <!--<div class="input-group">-->
+                <input type="hidden" class="form-control" placeholder="Year" id="year">
+            <!--</div>-->
+            <label for="month">Month</label>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Month" id="month">
+            </div>
+            <!--<label for="dayOfMonth">Day of Month</label>-->
+            <!--<div class="input-group">-->
+                <input type="hidden" class="form-control" placeholder="Day Of Month" id="dayOfMonth">
+            <!--</div>-->
+            <label for="dayOfWeek">Day of Week</label>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Day Of Week" id="dayOfWeek">
+            </div>
+            <label for="depTime">Departure Time</label>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Departure Time" id="depTime">
+            </div>
+            <label for="uniqueCarrier">Carrier</label>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Unique Carrier" id="uniqueCarrier">
+            </div>
+            <label for="flightNum">Flight Num</label>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Flight Num." id="flightNum">
+            </div>
+            <label for="origin">Origin</label>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Origin" id="origin">
+            </div>
+            <label for="dest">Destination</label>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Destination" id="dest">
+            </div>
+            <div>
+                <a class="btn btn-lg btn-primary" href="#navbar" onclick="javascript:submitForm();"
+                   role="button">Go &raquo;</a>
+                <div id="prediction"></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function submitForm() {
+        document.getElementById('predictForm').submit();
+    }
+
+    function predictFlight() {
+        var r = new XMLHttpRequest();
+        r.open("POST", "api/flight", true);
+        r.onreadystatechange = function () {
+            if (r.readyState != 4 || r.status != 200) return;
+            console.log("Success: " + r.responseText);
+            var late = JSON.parse(r.responseText)['late'];
+            var prob = JSON.parse(r.responseText)['confidence'];
+            console.log(late);
+            document.getElementById('prediction').className = late ? 'btn btn-danger' : 'btn btn-success';
+            var prediction = (late ? '😱 Sorry your flight will be delayed' : '😌 Your flight should not be late') + ' (' + prob + ')';
+            document.getElementById('prediction').innerHTML = prediction;
+        };
+
+        var form = document.getElementById('predictForm');
+        var data = new FormData(form);
+        r.setRequestHeader("Content-Type", "application/json");
+        //r.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        r.send(JSON.stringify({year: form.elements['year'].value,
+                                month: form.elements['month'].value,
+                                dayOfMonth: form.elements['dayOfMonth'].value,
+                                dayOfWeek: form.elements['dayOfWeek'].value,
+                                depTime: form.elements['depTime'].value,
+                                uniqueCarrier: form.elements['uniqueCarrier'].value,
+                                flightNum: form.elements['flightNum'].value,
+                                origin: form.elements['origin'].value,
+                                dest: form.elements['dest'].value}));
+    }
+
+
+
+
+
+</script>
+<script type="text/javascript"
+        src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</body>
+</html>
